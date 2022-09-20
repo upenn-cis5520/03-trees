@@ -1,6 +1,7 @@
 {-
 ---
 fulltitle: "Extra practice: Tree folds"
+date: September 21, 2022
 ---
 -}
 
@@ -88,16 +89,20 @@ If you turn on benchmarking, you can observe the difference between a left
  these trees dominates the computation, but take a look at the difference in
  allocation!
 
-        λ> sum (infixOrder (bigRightTree 10000))
+        ghci> :set +s
+        ghci> sum (infixOrder (bigRightTree 10000))
         50005000
-        (0.02 secs, 6,623,512 bytes)
-        λ> sum (infixOrder (bigLeftTree 10000))
+        (0.02 secs, 7,102,016 bytes)
+        ghci> sum (infixOrder (bigLeftTree 10000))
         50005000
-        (0.97 secs, 4,305,875,672 bytes)
+        (0.97 secs, 4,305,693,360 bytes)
 
 We can improve things by using DLists while traversing the tree. Try to
- complete this version so that the number of bytes used for traversing t1 and
- t2 is more similar to the version above...
+complete this version so that the number of bytes used for traversing t1 and
+t2 is more similar to the version above...
+(NOTE: There is an implementation of DLists in the standard library, and we
+have imported it above. So you can try this even if you did not complete the
+DList exercise.)
 -}
 
 infixOrder1 :: Tree a -> [a]
@@ -107,12 +112,12 @@ tinfixOrder1 :: Test
 tinfixOrder1 = "infixOrder1a" ~: infixOrder1 exTree ~?= [1, 2, 4, 5, 9, 7]
 
 {-
-       λ> sum (infixOrder1 (bigRightTree 10000))
+       ghci> sum (infixOrder1 (bigRightTree 10000))
        50005000
-       (0.02 secs, 8,543,832 bytes)
-       λ> sum (infixOrder1 (bigLeftTree 10000))
+       (0.02 secs, 9,016,880 bytes)
+       ghci> sum (infixOrder1 (bigLeftTree 10000))
        50005000
-       (0.01 secs, 8,543,832 bytes)
+       (0.02 secs, 9,016,880 bytes)
 
 Now, let's inline the DList definitions and get rid of the uses of `(.)` and `id`.
 -}
@@ -121,6 +126,12 @@ infixOrder2 :: Tree Int -> [Int]
 infixOrder2 = undefined
 
 {-
+On my microbenchmark, this also sped up the traversal!
+
+       ghci> sum (infixOrder2 (bigLeftTree 10000))
+       50005000
+       (0.01 secs, 6,696,624 bytes)
+
 Foldable Trees
 --------------
 
@@ -135,7 +146,11 @@ infixOrder3 :: Tree Int -> [Int]
 infixOrder3 = undefined
 
 {-
-Then we abstract them from the definition.
+       ghci> sum (infixOrder3 (bigLeftTree 10000))
+       50005000
+       (0.01 secs, 6,856,744 bytes)
+
+Then we abstract them to make a generic `foldr` function for trees.
 -}
 
 foldrTree :: (a -> b -> b) -> b -> Tree a -> b
@@ -147,6 +162,14 @@ foldrTree f b t = undefined
 
 infixOrder4 :: Tree a -> [a]
 infixOrder4 = foldrTree (:) []
+
+{-
+       ghci> sum (infixOrder4 (bigLeftTree 10000))
+       50005000
+       (0.01 secs, 6,856,728 bytes)
+
+This fold function is general. We can use it define *many* different tree operations.
+-}
 
 sizeTree :: Tree Int -> Int
 sizeTree = foldrTree (const (1 +)) 0
@@ -161,6 +184,9 @@ allTree :: (a -> Bool) -> Tree a -> Bool
 allTree f = foldrTree (\x b -> f x && b) True
 
 {-
+Extra challenge
+---------------
+
 Now use `foldrTree` as an inspiration to define a `foldlTree` function, which
 folds over the tree in the opposite order.
 -}
@@ -175,8 +201,7 @@ trevOrder :: Test
 trevOrder = "revOrder" ~: revOrder exTree ~?= [7, 9, 5, 4, 2, 1]
 
 {-
-Note: this tree fold is not the same as a more general `fold`-like operation
- for trees that captures the general principle of tree recursion.
+Note: Although they are efficient and useful, neither `foldlTree` nor `foldrTree` capture the general principle of tree recursion.
 -}
 
 foldTree :: (a -> b -> b -> b) -> b -> Tree a -> b
