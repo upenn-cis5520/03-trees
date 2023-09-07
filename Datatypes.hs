@@ -1,7 +1,7 @@
 {-
 ---
 fulltitle: User-defined datatypes
-date: September 19, 2022
+date:
 ---
 -}
 
@@ -236,39 +236,71 @@ Records
 One nice feature of the Java implementation is that it gives names to the
 individual fields.
 
-We can do this in Haskell too by giving *names* to the arguments of data
-constructors, using records.  For example, we can define a point in space as
-an x and y coordinate.
+Suppose we would like to represent a point in space, using its `x` and `y`
+coordinates. One way we might do so is with the following datatype definition:
+
+        data Point = NewPoint Double Double
+
+This line defines the `Point` type as the application of the data constructor `NewPoint`
+to two `Double`s, the `x` and `y` coordinates of the point.
+However, when we construct a point using this data constructor, we need to remember
+that the first double corresponds to the `x` value and the second corresponds to the
+`y` value.
 -}
 
-data Point = Point {x :: Double, y :: Double}
-  deriving (Show, Eq)
-
-point1 :: Point
-point1 = Point {y = 1.0, x = 2.0} -- order doesn't matter
-
-point2 :: Point
-point2 = Point 1.0 1.0 -- Be careful, Haskell will let you leave the field names off
--- but here the order does matter
+point :: Point
+point = NewPoint 2.0 1.0 -- Be careful, the order matters
 
 {-
-Each field name also defines a *selector* for that component of the data
-structure.
+We can do better in Haskell by giving *names* to the individual arguments of data
+constructors, like this:
+-}
+
+data Point = NewPoint {x :: Double, y :: Double}
+  deriving (Show, Eq)
+
+{-
+This form of datatype definition is called a *record*.
+
+The names `x` and `y`, are called *field names* and provide more documentation about the type.
+They let us know that we intend the first argument to be the `x` coordinate and the
+second to be the `y` coordinate. We construct a `Point` we can use these names
+for better readability.
+-}
+
+point1 :: Point
+point1 = NewPoint {x = 2.0, y = 1.0} -- explicit field names
+
+{-
+We can also use these names for more flexibility during construction. For example, we can
+swap the order of the arguments.
+-}
+
+point2 :: Point
+point2 = NewPoint {y = 1.0, x = 2.0} -- Same as `point1`
+
+{-
+Furthermore, each field name also defines a *selector* for that component of the data
+structure. The selector is a function with the same name as the field that can be
+used to directly extract that component from the type.
 -}
 
 x1 :: Double
 x1 = x point1
 
+-- Access the x component of point2
+-- >>> x point2
+
 {-
 When taking arguments that use records, we can either use the
-record selectors, or use pattern-matching.
+record selectors to access their components, or use pattern-matching.
 -}
 
 distFromOrigin :: Point -> Double
-distFromOrigin Point {x = px, y = py} = sqrt (px * px + py * py)
+distFromOrigin NewPoint {x = px, y = py} = sqrt (px * px + py * py)
 
 {-
-Rewrite this function using selectors `x` and `y`:
+Now, rewrite this function using selectors `x` and `y`:
 -}
 
 distFromOrigin' :: Point -> Double
@@ -281,15 +313,16 @@ Things to watch out for with records in Haskell:
 
  * Records must be defined as part of a datatype definition.
 
- * The selectors are first-class functions---there is no such thing
-   as "`r.x`". This is really great for higher-order programming, i.e.
+ * The selectors are first-class functions. This is really great for
+   higher-order programming, i.e.
    we can easily access all of the `x` components from a list of points
    with
 
           map x points
 
- * Record selectors must be unique within a module. If `Point` has an `x`
-   component, then no other datatype in that module can use `x`.
+ * Record selectors must be *unique* within a module. If `Point` has an `x`
+   field name, then no other datatype in that module can use `x` as a field
+   name.
 
  * Record selectors are just normal variable names. So if `Point` has an `x`
    component, there cannot be another top-level definition in the module
@@ -302,10 +335,10 @@ Things to watch out for with records in Haskell:
 -}
 
 distFromOrigin'' :: Point -> Double
-distFromOrigin'' Point {x = x, y = y} = sqrt (x * x + y * y)
+distFromOrigin'' NewPoint {x = x, y = y} = sqrt (x * x + y * y)
 
 {-
- * Records are purely functional in Haskell. There is no way to modify
+ * Records are immutable in Haskell. There is no way to modify
    a component when it is created. However, there is an easy way to
    construct new values that share components with existing structures.
 -}
@@ -313,10 +346,13 @@ distFromOrigin'' Point {x = x, y = y} = sqrt (x * x + y * y)
 point3 :: Point
 point3 = point1 {x = 2.0}
 
--- point3 is a Point with x component equal to 2.0,
--- and all others (which is only y here) the same as point1
-
 {-
+   This syntax is called *record update*. It is a purely functional way to
+   create a new record value by reusing the components of an existing record.
+   Above, `point3` is a `Point with `x` component equal to 2.0, and all other
+   components (which is only `y` here) the same as `point1`. When records have
+   many components, this can be a very useful feature.
+
  * Haskell's record system is far from perfect. It's strange that records must
    be defined as part of data constructors. The fact that different record
    types in the same module cannot share fields names can be awkward. It can

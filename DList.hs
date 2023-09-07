@@ -1,7 +1,7 @@
 {-
 ---
 fulltitle: "In class exercise: Difference lists"
-date: September 21, 2022
+date:
 ---
 -}
 

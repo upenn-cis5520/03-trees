@@ -1,7 +1,7 @@
 {-
 ---
 fulltitle: "Extra practice: Tree folds"
-date: September 21, 2022
+date:
 ---
 -}
 
