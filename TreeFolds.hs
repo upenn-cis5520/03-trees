@@ -55,8 +55,8 @@ testInfixOrder :: Test
 testInfixOrder = "infixOrder" ~: infixOrder exTree ~?= [1, 2, 4, 5, 9, 7]
 
 {-
-However, if you did the DList exercise, the (++) in the definition of
- `infixOrder` should bother you. What if the tree is terribly right-skewed?
+However, as in the DList exercise, the (++) in the definition of
+ `infixOrder` should bother you. What if the tree is terribly skewed?
 
                  1
                 /
@@ -85,9 +85,9 @@ bigLeftTree m = go 0
 
 {-
 If you turn on benchmarking, you can observe the difference between a left
- skewed and right skewed tree in ghci.  At this scale, the time taken to print
- these trees dominates the computation, but take a look at the difference in
- allocation!
+skewed and right skewed tree in ghci.  At this scale, the time taken to print
+these trees dominates the computation, but take a look at the difference in
+allocation!
 
         ghci> :set +s
         ghci> sum (infixOrder (bigRightTree 10000))
@@ -97,12 +97,12 @@ If you turn on benchmarking, you can observe the difference between a left
         50005000
         (0.97 secs, 4,305,693,360 bytes)
 
-We can improve things by using DLists while traversing the tree. Try to
+We can improve things by using `DList`s while traversing the tree. Try to
 complete this version so that the number of bytes used for traversing t1 and
 t2 is more similar to the version above...
-(NOTE: There is an implementation of DLists in the standard library, and we
-have imported it above. So you can try this even if you did not complete the
-DList exercise.)
+(NOTE: There is an implementation of `DList`s in the standard library, and we
+have imported it above. So you can try this out even if you have not completed the
+`DList` exercise.)
 -}
 
 infixOrder1 :: Tree a -> [a]
@@ -119,7 +119,7 @@ tinfixOrder1 = "infixOrder1a" ~: infixOrder1 exTree ~?= [1, 2, 4, 5, 9, 7]
        50005000
        (0.02 secs, 9,016,880 bytes)
 
-Now, let's inline the DList definitions and get rid of the uses of `(.)` and `id`.
+Now, let's inline the `DList` definitions to get rid of the uses of `(.)` and `id`.
 -}
 
 infixOrder2 :: Tree Int -> [Int]
@@ -135,7 +135,7 @@ On my microbenchmark, this also sped up the traversal!
 Foldable Trees
 --------------
 
-Does this idea generalize to forms of tree recursion? You betcha.
+Does this idea generalize to other forms of tree recursion? You betcha.
 
 Let's generalize the "base case" and "inductive step" of the definition above, separating
 the recursion from the specific operation of traversal. First, we identify these operators
