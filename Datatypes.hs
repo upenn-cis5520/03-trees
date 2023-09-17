@@ -213,7 +213,7 @@ the data constructors of a datatype. The `area` method works for both circles
 and rectangles, using dynamic dispatch instead of pattern matching to select
 the appropriate code.
 
-Once difference between these two implementations is that Haskell datatypes are
+One difference between these two implementations is that Haskell datatypes are
 easy to extend with new operations but harder to extend with new variants. If
 we want a new operation on `Shape`s, we need only define a new function by
 pattern matching. However, to add a new kind of `Shape` we need to add a new
@@ -221,7 +221,7 @@ variant to the datatype definition and update each of the function definitions
 with a new case in the pattern matching. (The compiler will tell us if we miss
 any.)
 
-In Java, it is the reverse situation. We can easly add a new kind of `Shape`
+In Java, it is the reverse situation. We can easily add a new kind of `Shape`
 by adding a new object that implements the interface. However, to add a new
 operation, we need to edit the interface to include the new method and then
 update all of the existing classes with the new method definition. (The
