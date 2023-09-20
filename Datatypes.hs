@@ -377,6 +377,9 @@ data IntListNE
   = ISingle Int
   | ICons Int IntListNE
 
+-- library non empty list
+data IntListNE' = IntListNE' Int [Int]
+
 {-
 So that the list `[1,2,3]` is represented as:
 -}

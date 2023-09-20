@@ -106,7 +106,11 @@ have imported it above. So you can try this out even if you have not completed t
 -}
 
 infixOrder1 :: Tree a -> [a]
-infixOrder1 = undefined
+infixOrder1 t = DL.toList (f t)
+  where
+    f :: Tree a -> DL.DList a
+    f Empty = DL.empty
+    f (Branch x l r) = f l `DL.append` DL.singleton x `DL.append` f r
 
 tinfixOrder1 :: Test
 tinfixOrder1 = "infixOrder1a" ~: infixOrder1 exTree ~?= [1, 2, 4, 5, 9, 7]
@@ -123,7 +127,21 @@ Now, let's inline the `DList` definitions to get rid of the uses of `(.)` and `i
 -}
 
 infixOrder2 :: Tree Int -> [Int]
-infixOrder2 = undefined
+infixOrder2 t = f t []
+  where
+    f :: Tree a -> [a] -> [a]
+    f Empty  = \x -> x
+    f (Branch x l r) = (\xs ys -> (\p -> (xs . ys) p)) (f l) ((\xs ys -> (\p -> (xs . ys) p)) (\p -> x : p) (f r))
+
+infixOrder2' :: Tree Int -> [Int]
+infixOrder2' t = f t []
+  where
+    f :: Tree a -> [a] -> [a]
+    f Empty x = x
+    f (Branch x l r) y = f l (x : f r y)  -- (f l . ((x:) . f r)) y 
+
+--     f (Branch x l r) = f l `append` (\p -> x : p) `append` f r
+--    append xs ys = \p -> (xs . ys) p
 
 {-
 On my microbenchmark, this also sped up the traversal!
