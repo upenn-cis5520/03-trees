@@ -1,7 +1,7 @@
 {-
 ---
 fulltitle: "Extra practice: Tree folds"
-date:
+date: September 20, 2023
 ---
 -}
 
@@ -143,7 +143,11 @@ inside the definition of infixOrder.
 -}
 
 infixOrder3 :: Tree Int -> [Int]
-infixOrder3 = undefined
+infixOrder3 t = aux t b
+  where
+    b = []
+    f = (:)
+    aux = undefined
 
 {-
        ghci> sum (infixOrder3 (bigLeftTree 10000))
